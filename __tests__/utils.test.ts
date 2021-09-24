@@ -2,9 +2,11 @@ import * as github from '@actions/github'
 import {
     chooseUsers,
     chooseUsersFromGroups,
+    diffMatchesKeywords,
     fetchConfigurationFile,
     includesTitleKeywordsToSkip,
 } from '../src/utils'
+import GitDiffParser from 'git-diff-parser'
 
 jest.mock('@actions/github')
 
@@ -56,6 +58,39 @@ describe('chooseUsers', () => {
         const list = chooseUsers(reviewers, numberOfReviewers)
 
         expect(list).toEqual(expect.arrayContaining(['pr-creator']))
+    })
+})
+
+describe('diffMatchesKeywords', () => {
+    const diffResult = {
+        commits: [
+            {
+                files: [
+                    {
+                        lines: [
+                            { type: 'added', text: 'foo' },
+                            { type: 'deleted', text: 'bar' },
+                        ],
+                    },
+                ],
+            },
+        ],
+    } as GitDiffParser.Result
+    test('matches a keyword in the pull request diff', () => {
+        const diffKeywords = ['foo']
+        expect(diffMatchesKeywords(diffResult, diffKeywords)).toEqual(true)
+    })
+    test('does not match a keyword in a deleted line', () => {
+        const diffKeywords = ['bar']
+        expect(diffMatchesKeywords(diffResult, diffKeywords)).toEqual(false)
+    })
+    test('returns true upon matching just one keyword in a set', () => {
+        const diffKeywords = ['bar', 'foo']
+        expect(diffMatchesKeywords(diffResult, diffKeywords)).toEqual(true)
+    })
+    test('ignores case sensitivity', () => {
+        const diffKeywords = ['bar', 'FOO']
+        expect(diffMatchesKeywords(diffResult, diffKeywords)).toEqual(true)
     })
 })
 
@@ -201,7 +236,7 @@ describe('fetchConfigurationFile', () => {
         } as any
 
         const config = await fetchConfigurationFile(client, {
-            owner: 'kentaro-m',
+            owner: 'acorretti',
             repo: 'auto-assign-action-test',
             path: '.github/auto_assign',
             ref: 'sha',
@@ -228,7 +263,7 @@ describe('fetchConfigurationFile', () => {
 
         expect(
             fetchConfigurationFile(client, {
-                owner: 'kentaro-m',
+                owner: 'acorretti',
                 repo: 'auto-assign-action-test',
                 path: '.github/auto_assign',
                 ref: 'sha',

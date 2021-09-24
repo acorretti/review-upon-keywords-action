@@ -1,6 +1,7 @@
 import * as yaml from 'js-yaml'
 import { Config } from './handler'
 import _ from 'lodash'
+import DiffParser = require('git-diff-parser')
 import Octokit = require('@octokit/rest')
 
 export function chooseReviewers(owner: string, config: Config): string[] {
@@ -97,6 +98,32 @@ export function includesTitleKeywordsToSkip(
     }
 
     return false
+}
+
+export function diffMatchesKeywords(
+    diff: DiffParser.Result,
+    diffKeywords: string[]
+): boolean {
+    let match = false
+    for (const commit of diff.commits) {
+        for (const file of commit.files) {
+            for (const line of file.lines) {
+                if (line.type === 'added') {
+                    for (const diffKeyword of diffKeywords) {
+                        if (
+                            line.text
+                                .toLowerCase()
+                                .includes(diffKeyword.toLowerCase())
+                        ) {
+                            match = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return match
 }
 
 export function chooseUsersFromGroups(

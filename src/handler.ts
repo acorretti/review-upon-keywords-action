@@ -78,6 +78,16 @@ export async function handlePullRequest(
     const owner = user.login
     const pr = new PullRequest(client, context)
 
+    if (
+        diffKeywords &&
+        !utils.diffMatchesKeywords(await pr.getDiff(), diffKeywords)
+    ) {
+        core.info(
+            'Skips the process to add reviewers/assignees since PR diff does not includes diff-keywords'
+        )
+        return
+    }
+
     if (filterLabels !== undefined) {
         if (
             filterLabels.include !== undefined &&

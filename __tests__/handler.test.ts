@@ -2,7 +2,10 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as handler from '../src/handler'
+import * as utils from '../src/utils'
 import { Context } from '@actions/github/lib/context'
+import { PullRequest } from '../src/pullrequest'
+import { Result } from 'git-diff-parser'
 
 jest.mock('@actions/core')
 jest.mock('@actions/github')
@@ -30,16 +33,16 @@ describe('handlePullRequest', () => {
                 repository: {
                     name: 'auto-assign',
                     owner: {
-                        login: 'kentaro-m',
+                        login: 'acorretti',
                     },
                 },
             },
             repo: {
-                owner: 'kentaro-m',
+                owner: 'acorretti',
                 repo: 'auto-assign',
             },
             issue: {
-                owner: 'kentaro-m',
+                owner: 'acorretti',
                 repo: 'auto-assign',
                 number: 1,
             },
@@ -84,6 +87,31 @@ describe('handlePullRequest', () => {
         expect(spy.mock.calls[0][0]).toEqual(
             'Skips the process to add reviewers/assignees since PR title includes skip-keywords'
         )
+    })
+
+    test('exits the process if pull requests does not include diff keywords', async () => {
+        const spy = jest.spyOn(core, 'info')
+        const prspy = jest
+            .spyOn(PullRequest.prototype, 'getDiff')
+            .mockResolvedValue(('diff' as unknown) as Result)
+        jest.spyOn(utils, 'diffMatchesKeywords').mockReturnValue(false)
+
+        const client = new github.GitHub('token')
+        const config = {
+            addAssignees: true,
+            addReviewers: true,
+            numberOfReviewers: 0,
+            reviewers: ['reviewer1', 'reviewer2', 'reviewer3'],
+            titleKeywordsToSkip: ['wip'],
+            diffKeywords: ['diff'],
+        } as any
+
+        await handler.handlePullRequest(client, context, config)
+
+        expect(spy.mock.calls[0][0]).toEqual(
+            'Skips the process to add reviewers/assignees since PR diff does not includes diff-keywords'
+        )
+        prspy.mockRestore()
     })
 
     test.each`

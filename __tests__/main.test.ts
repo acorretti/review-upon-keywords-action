@@ -36,16 +36,16 @@ describe('run', () => {
                 repository: {
                     name: 'auto-assign',
                     owner: {
-                        login: 'kentaro-m',
+                        login: 'acorretti',
                     },
                 },
             },
             repo: {
-                owner: 'kentaro-m',
+                owner: 'acorretti',
                 repo: 'auto-assign',
             },
             issue: {
-                owner: 'kentaro-m',
+                owner: 'acorretti',
                 repo: 'auto-assign',
                 number: 1,
             },

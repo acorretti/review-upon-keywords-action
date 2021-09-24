@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import { Context } from '@actions/github/lib/context'
+import DiffParser = require('git-diff-parser')
 import Octokit = require('@octokit/rest')
 
 export class PullRequest {
@@ -31,6 +32,21 @@ export class PullRequest {
             assignees,
         })
         core.debug(JSON.stringify(result))
+    }
+
+    async getDiff(): Promise<DiffParser.Result> {
+        if (!this.context.payload.pull_request) {
+            throw new Error('webhook payload not found')
+        }
+        const prDetails = await this.client.pulls.get({
+            owner: this.context.repo.owner,
+            repo: this.context.repo.repo,
+            number: this.context.payload.pull_request.number,
+        })
+        const { data: diffBody } = await this.client.request(
+            prDetails.data.diff_url
+        )
+        return DiffParser(diffBody)
     }
 
     hasAnyLabel(labels: string[]): boolean {

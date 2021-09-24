@@ -1,29 +1,32 @@
 # Review Upon Keywords Action
+
 An action which adds reviewers to the pull request when the pull request **body** matches specific keywords.
 
 Based on [auto-assign-action](https://github.com/kentaro-m/auto-assign-action) by @kentaro-m.
 
 ## :arrow_forward: Usage
+
 Create a workflow (e.g. `.github/workflows/action.yml` For more detail, refer to [Configuring a workflow](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file)) for running the action.
 
 ```yml
 name: 'Review Upon Keywords'
 on:
-  pull_request:
-    types: [opened, ready_for_review]
+    pull_request:
+        types: [opened, ready_for_review]
 
 jobs:
-  add-reviews:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: acorretti/review-upon-keyword-action@v1.0.0
-        with:
-          configuration-path: ".github/some_name_for_configs.yml" # Only needed if you use something other than .github/review_upon_keywords.yml
+    add-reviews:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: acorretti/review-upon-keyword-action@v1.0.0
+              with:
+                  configuration-path: '.github/some_name_for_configs.yml' # Only needed if you use something other than .github/review_upon_keywords.yml
 ```
 
 Create a separate configuration file for the action (e.g. `.github/review_upon_keywords.yml`).
 
 ### Single Reviewers List
+
 Add reviewers/assignees to the pull request based on single reviewers list.
 
 ```yaml
@@ -35,14 +38,13 @@ addAssignees: false
 
 # A list of reviewers to be added to pull requests (GitHub user name)
 reviewers:
-  - reviewerA
-  - reviewerB
-  - reviewerC
+    - reviewerA
+    - reviewerB
+    - reviewerC
 
 # A number of reviewers added to the pull request
 # Set 0 to add all the reviewers (default: 0)
 numberOfReviewers: 0
-
 # A list of assignees, overrides reviewers if set
 # assignees:
 #   - assigneeA
@@ -55,9 +57,14 @@ numberOfReviewers: 0
 # A list of keywords to be skipped the process that add reviewers if pull requests include it
 # titleKeywordsToSkip:
 #   - wip
+
+# Keywords to match in the PR diff in order for this action to be applied
+# diffKeywords:
+#   - some-matching-string
 ```
 
 ### Multiple Reviewers List
+
 Add reviewers/assignees to the pull request based on multiple reviewers list.
 
 If you and peers work at the separate office or they work at the separate team by roles like frontend and backend, you might be good to use adding reviewers from each group.
@@ -83,18 +90,17 @@ useReviewGroups: true
 
 # A list of reviewers, split into different groups, to be added to pull requests (GitHub user name)
 reviewGroups:
-  groupA:
-    - reviewerA
-    - reviewerB
-    - reviewerC
-  groupB:
-    - reviewerD
-    - reviewerE
-    - reviewerF
+    groupA:
+        - reviewerA
+        - reviewerB
+        - reviewerC
+    groupB:
+        - reviewerD
+        - reviewerE
+        - reviewerF
 
 # Set to true to add assignees from different groups to pull requests
 useAssigneeGroups: false
-
 # A list of assignees, split into different froups, to be added to pull requests (GitHub user name)
 # assigneeGroups:
 #   groupA:
@@ -109,9 +115,14 @@ useAssigneeGroups: false
 # A list of keywords to be skipped the process that add reviewers if pull requests include it
 # titleKeywordsToSkip:
 #   - wip
+
+# Keywords to match in the PR diff in order for this action to be applied
+# diffKeywords:
+#   - some-matching-string
 ```
 
 ### Assign Author as Assignee
+
 Add the PR creator as the assignee of the pull request.
 
 ```yaml
@@ -120,19 +131,31 @@ addAssignees: author
 ```
 
 ### Filter by label
+
 The action will only run if the PR meets the specified filters
 
 ```yaml
 filterLabels:
-  # Run
-  include:
-    - my_label
-    - another_label
-  # Not run
-  exclude:
-    - wip
+    # Run
+    include:
+        - my_label
+        - another_label
+    # Not run
+    exclude:
+        - wip
+```
 
+### Filter by PR diff keywords
+
+The action will only run if the PR contains the specified keywords in any added
+line, in any commit. Matches are case insensitive.
+
+```yaml
+diffKeywords:
+    - some-matching-string
+    - another-keyword
 ```
 
 ## :memo: License
+
 MIT
