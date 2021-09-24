@@ -1,17 +1,18 @@
-name: 'Auto Assign Action'
-description: 'Add reviewers to pull requests when pull requests are opened.'
-author: 'Kentaro Matsushita'
+name: 'Review Upon Keywords Action'
+description: 'Add reviewers when a PR changes matches some keywords.'
+author: 'Alfonso Corretti'
 inputs:
   repo-token:
     description: 'A token for the repo'
     default: ${{ github.token }}
     required: false
   configuration-path:
-    description: 'A path for the auto-assign configuration'
-    default: '.github/auto_assign.yml'
+    description: 'A path for the action configuration'
+    default: '.github/review_upon_keywords.yml'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: 'user-plus'
-  color: 'blue'
+  icon: 'search'
+  color: 'purple'

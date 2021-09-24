@@ -1,11 +1,13 @@
-# Auto Assign Action
-An action which adds reviewers to the pull request when the pull request is opened.
+# Review Upon Keywords Action
+An action which adds reviewers to the pull request when the pull request **body** matches specific keywords.
+
+Based on [auto-assign-action](https://github.com/kentaro-m/auto-assign-action) by @kentaro-m.
 
 ## :arrow_forward: Usage
-Create a workflow (e.g. `.github/workflows/action.yml` For more detail, refer to [Configuring a workflow](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file)) for running the auto-assign action.
+Create a workflow (e.g. `.github/workflows/action.yml` For more detail, refer to [Configuring a workflow](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file)) for running the action.
 
 ```yml
-name: 'Auto Assign'
+name: 'Review Upon Keywords'
 on:
   pull_request:
     types: [opened, ready_for_review]
@@ -14,12 +16,12 @@ jobs:
   add-reviews:
     runs-on: ubuntu-latest
     steps:
-      - uses: kentaro-m/auto-assign-action@v1.2.0
+      - uses: acorretti/review-upon-keyword-action@v1.0.0
         with:
-          configuration-path: ".github/some_name_for_configs.yml" # Only needed if you use something other than .github/auto_assign.yml
+          configuration-path: ".github/some_name_for_configs.yml" # Only needed if you use something other than .github/review_upon_keywords.yml
 ```
 
-Create a separate configuration file for the auto-assign action (e.g. `.github/auto_assign.yml`).
+Create a separate configuration file for the action (e.g. `.github/review_upon_keywords.yml`).
 
 ### Single Reviewers List
 Add reviewers/assignees to the pull request based on single reviewers list.
@@ -51,7 +53,7 @@ numberOfReviewers: 0
 # numberOfAssignees: 2
 
 # A list of keywords to be skipped the process that add reviewers if pull requests include it
-# skipKeywords:
+# titleKeywordsToSkip:
 #   - wip
 ```
 
@@ -105,7 +107,7 @@ useAssigneeGroups: false
 #     - assigneeF
 
 # A list of keywords to be skipped the process that add reviewers if pull requests include it
-# skipKeywords:
+# titleKeywordsToSkip:
 #   - wip
 ```
 
@@ -132,5 +134,5 @@ filterLabels:
 
 ```
 
-## :memo: Licence
+## :memo: License
 MIT
